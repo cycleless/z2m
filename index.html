@@ -1,403 +1,614 @@
 <!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cycleless — Чек-лист: 10 точек утечки прибыли</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --accent: #d4ff33;
-      --accent-dim: rgba(212,255,51,0.08);
-      --accent-border: rgba(212,255,51,0.25);
-      --bg: #07080a;
-      --bg-2: #0c0f13;
-      --bg-3: #111620;
-      --border: rgba(255,255,255,0.06);
-      --text: #dde4ec;
-      --muted: #5a6a7a;
-      --font-d: 'Syne', sans-serif;
-      --font-b: 'DM Sans', sans-serif;
-      --font-m: 'JetBrains Mono', monospace;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-b);
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: linear-gradient(rgba(212,255,51,.025) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(212,255,51,.025) 1px, transparent 1px);
-      background-size: 64px 64px;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .landing {
-      position: relative;
-      z-index: 1;
-      max-width: 800px;
-      width: 100%;
-      padding: 40px 28px 60px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 8px;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .logo svg { width: 44px; height: 44px; }
-    .logo span {
-      font-family: var(--font-d);
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.02em;
-    }
-    .logo span .accent { color: var(--accent); }
-    .title {
-      font-family: var(--font-d);
-      font-weight: 800;
-      font-size: 38px;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-    }
-    .subtitle {
-      font-family: var(--font-m);
-      font-size: 14px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-    .checklist {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-    .check-item {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 24px;
-      position: relative;
-      transition: border-color 0.2s;
-    }
-    .check-item.checked {
-      border-color: var(--accent-border);
-      background: rgba(212,255,51,0.03);
-    }
-    .check-item .row {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-    }
-    .custom-checkbox {
-      flex-shrink: 0;
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: 2px solid var(--muted);
-      background: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 2px;
-    }
-    .custom-checkbox i {
-      color: var(--accent);
-      font-size: 14px;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .check-item.checked .custom-checkbox {
-      border-color: var(--accent);
-      background: var(--accent-dim);
-    }
-    .check-item.checked .custom-checkbox i { opacity: 1; }
-    .question-text {
-      flex: 1;
-      font-size: 17px;
-      font-weight: 500;
-      line-height: 1.5;
-      color: var(--text);
-      cursor: pointer;
-      user-select: none;
-    }
-    .solution-block {
-      display: none;
-      margin-top: 18px;
-      padding: 16px 20px;
-      background: var(--accent-dim);
-      border: 1px solid var(--accent-border);
-      border-radius: 12px;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.6;
-    }
-    .check-item.checked .solution-block { display: block; }
-    .solution-block .solution-title {
-      font-family: var(--font-m);
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      color: var(--accent);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-    .result-box {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px 32px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-    .result-counter {
-      font-family: var(--font-d);
-      font-size: 48px;
-      font-weight: 800;
-      color: var(--accent);
-    }
-    .result-message {
-      font-size: 16px;
-      color: var(--text);
-      max-width: 500px;
-    }
-    .button-group {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 28px;
-      border-radius: 30px;
-      font-family: var(--font-m);
-      font-size: 14px;
-      font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .btn-accent {
-      background: var(--accent);
-      color: #07080a;
-      border: 2px solid var(--accent);
-    }
-    .btn-accent:hover { background: #c0e830; }
-    .btn-outline {
-      background: var(--accent-dim);
-      border: 1px solid var(--accent-border);
-      color: var(--accent);
-    }
-    .btn-outline:hover { background: rgba(212,255,51,0.15); }
-    .footer-note {
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 12px;
-    }
-    .hidden-input { display: none; }
-    @media print {
-      .btn, .button-group { display: none !important; }
-    }
-  </style>
-</head>
-<body>
-  <div class="landing" id="landingContent">
-    <!-- Header -->
-    <div class="header">
-      <div class="logo">
-        <svg width="44" height="44" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="32" height="32" rx="6" fill="#050806"/>
-          <path d="M16 5L25.5 10.5V21.5L16 27L6.5 21.5V10.5L16 5Z" stroke="#D4FF33" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M16 5V16L25.5 21.5M16 16L6.5 22M16 27V16L25.5 10.5M16 16L6.5 10.5" stroke="#D4FF33" stroke-width="1.2" opacity="0.9"/>
-          <circle cx="16" cy="16" r="1.5" fill="#D4FF33"/>
-        </svg>
-        <span>Cycle<span class="accent">less</span></span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>Cycleless — Жёсткий аудит бизнеса: где вы сливаете деньги</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #07080a;
+        color: #dde4ec;
+        font-family: "DM Sans", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+      }
+
+      /* Сетка как у оригинала */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(212, 255, 51, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(212, 255, 51, 0.025) 1px, transparent 1px);
+        background-size: 64px 64px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      :root {
+        --accent: #d4ff33;
+        --accent-dim: rgba(212, 255, 51, 0.06);
+        --accent-border: rgba(212, 255, 51, 0.25);
+        --bg-2: #0c0f13;
+        --border: rgba(255, 255, 255, 0.06);
+        --muted: #5a6a7a;
+        --font-m: "JetBrains Mono", monospace;
+      }
+
+      .landing {
+        position: relative;
+        z-index: 1;
+        max-width: 860px;
+        width: 100%;
+        padding: 36px 24px 60px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo svg {
+        width: 44px;
+        height: 44px;
+      }
+
+      .logo span {
+        font-family: "Syne", sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .logo span .accent {
+        color: var(--accent);
+      }
+
+      .badge {
+        background: var(--accent-dim);
+        border: 1px solid var(--accent-border);
+        border-radius: 60px;
+        padding: 6px 14px;
+        font-family: var(--font-m);
+        font-size: 12px;
+        color: var(--accent);
+      }
+
+      .title {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 42px;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: 12px;
+      }
+
+      .subhead {
+        font-family: var(--font-m);
+        font-size: 14px;
+        color: var(--muted);
+        border-left: 3px solid var(--accent);
+        padding-left: 16px;
+        margin-top: 6px;
+      }
+
+      .instruction {
+        background: var(--bg-2);
+        border-radius: 20px;
+        padding: 16px 20px;
+        font-size: 15px;
+        border: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .instruction i {
+        color: var(--accent);
+        font-size: 22px;
+      }
+
+      /* Блоки чеклиста */
+      .block-section {
+        margin-bottom: 28px;
+      }
+
+      .block-title {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: -0.3px;
+      }
+
+      .block-title i {
+        color: var(--accent);
+        font-size: 20px;
+      }
+
+      .checklist-group {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .check-item {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 16px 20px;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .check-item.checked {
+        border-color: var(--accent-border);
+        background: rgba(212, 255, 51, 0.03);
+      }
+
+      .row {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+      }
+
+      .custom-checkbox {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        border: 2px solid var(--muted);
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        margin-top: 2px;
+      }
+
+      .custom-checkbox i {
+        color: var(--accent);
+        font-size: 13px;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+
+      .check-item.checked .custom-checkbox {
+        border-color: var(--accent);
+        background: var(--accent-dim);
+      }
+
+      .check-item.checked .custom-checkbox i {
+        opacity: 1;
+      }
+
+      .question-text {
+        flex: 1;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.45;
+        color: #eef3fc;
+      }
+
+      /* Результаты */
+      .result-box {
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 28px 32px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .result-counter {
+        font-family: "Syne", sans-serif;
+        font-size: 52px;
+        font-weight: 800;
+        color: var(--accent);
+        line-height: 1;
+      }
+
+      .result-message {
+        font-size: 17px;
+        color: #ccddee;
+        max-width: 550px;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 12px 18px;
+        border-radius: 60px;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 32px;
+        border-radius: 40px;
+        font-family: var(--font-m);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: 0.2s;
+      }
+
+      .btn-accent {
+        background: var(--accent);
+        color: #07080a;
+        border: 2px solid var(--accent);
+      }
+
+      .btn-accent:hover {
+        background: #c0e830;
+        transform: scale(0.97);
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--accent-border);
+        color: var(--accent);
+      }
+
+      .btn-outline:hover {
+        background: rgba(212, 255, 51, 0.1);
+      }
+
+      .footer-note {
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 16px;
+        font-family: var(--font-m);
+      }
+
+      @media (max-width: 600px) {
+        .landing {
+          padding: 24px 16px 40px;
+        }
+        .title {
+          font-size: 32px;
+        }
+        .check-item {
+          padding: 14px 16px;
+        }
+        .result-box {
+          padding: 22px 20px;
+        }
+        .btn {
+          padding: 12px 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="landing">
+      <div class="header">
+        <div class="logo">
+          <svg
+            width="44"
+            height="44"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="32" height="32" rx="6" fill="#050806" />
+            <path
+              d="M16 5L25.5 10.5V21.5L16 27L6.5 21.5V10.5L16 5Z"
+              stroke="#D4FF33"
+              stroke-width="2"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M16 5V16L25.5 21.5M16 16L6.5 22M16 27V16L25.5 10.5M16 16L6.5 10.5"
+              stroke="#D4FF33"
+              stroke-width="1.2"
+              opacity="0.9"
+            />
+            <circle cx="16" cy="16" r="1.5" fill="#D4FF33" />
+          </svg>
+          <span>Cycle<span class="accent">less</span></span>
+        </div>
+        <div class="badge">
+          <i class="fas fa-microphone-alt"></i> честный разговор
+        </div>
+      </div>
+
+      <div>
+        <div class="title">
+          🔴 АУДИТ БИЗНЕСА:<br />ГДЕ ВЫ СЛИВАЕТЕ ДЕНЬГИ И ВРЕМЯ?
+        </div>
+        <div class="subhead">
+          Без эвфемизмов и архитектурной магии — только жирные точки утечки
+        </div>
+      </div>
+
+      <div class="instruction">
+        <i class="fas fa-hand-fist"></i>
+        <span
+          >☑️ Ставь галочку, если утверждение — про тебя и твой бизнес. Не ври
+          себе. Чем больше честных «да» — тем глубже яма, где тонут
+          деньги.</span
+        >
+      </div>
+
+      <div id="checklistRoot"></div>
+
+      <div class="result-box" id="resultBox">
+        <div class="result-counter" id="resultCounter">0 / 16</div>
+        <div class="result-message" id="resultMessage">
+          ⚡ Нажми кнопку «Проверить диагноз» — узнаешь, насколько жестко тебя
+          жрут процессы.
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-accent" id="checkResultsBtn">
+          <i class="fas fa-stethoscope"></i> Проверить результаты
+        </button>
+        <a
+          href="https://t.me/+ZJgdCCda1NVhYzhi"
+          target="_blank"
+          class="btn btn-outline"
+          ><i class="fab fa-telegram"></i> Больше пользы в закрытом Telegram
+          канале</a
+        >
+      </div>
+      <div class="footer-note">
+        2026 Cycleless — AI-интегратор. Превращаем хаос в автономный конвейер.
       </div>
     </div>
-    <div>
-      <div class="title">Пройдите 10-минутный аудит</div>
-      <div class="subtitle">Где ваша компания теряет деньги из-за ручной работы?</div>
-    </div>
 
-    <!-- Чек-лист -->
-    <div class="checklist" id="checklistContainer">
-      <!-- Пункты будут вставлены через JS -->
-    </div>
+    <script>
+      // ---------- НОВЫЙ ЖЁСТКИЙ ЧЕКЛИСТ (16 пунктов, без решений, только правда) ----------
+      const blocks = [
+        {
+          title: "Рутина и цифровое рабство",
+          icon: "fa-robot",
+          items: [
+            "Мои сотрудники до сих пор копипастят данные руками из почты/мессенджера в CRM или таблицы.",
+            "У нас есть процессы, где люди просто переносят цифры из одной таблички в другую, чтобы 'сошлось'.",
+            "Документы (счета, накладные, акты) формируются руками, а потом кто-то их еще и в 1С забивает.",
+            "Если ключевой сотрудник (бух, продажник, логист) уходит в отпуск или увольняется — процесс встает колом.",
+          ],
+        },
+        {
+          title: "Корпоративный склероз",
+          icon: "fa-brain",
+          items: [
+            "Новенькие сотрудники до полугода тупят и дергают старожилов вопросами 'а как мы это делаем?', потому что нормальных регламентов нет.",
+            "Актуальные инструкции теряются в недрах Google Дока, и никто не знает, какая версия рабочая, а какая от 2019 года.",
+            "Уволился сеньор — и половина знаний о том, 'как общаться с этим сложным клиентом' или 'где лежит доступ к тому серверу', ушла вместе с ним.",
+          ],
+        },
+        {
+          title: "Клиентский слив",
+          icon: "fa-users-slash",
+          items: [
+            "Заявки с сайта/Авито/Инсты падают в общую кучу, и скорость ответа зависит от того, насколько менеджер не занят кофе.",
+            "Клиенты периодически слышат: 'А кто вам это обещал? У нас в системе этого нет', потому что менеджеры не ведут историю.",
+            "Клиент оплачивает счет, а статус заказа менеджер должен где-то посмотреть, где-то поменять, и часто забывает об этом.",
+          ],
+        },
+        {
+          title: "ИТ-Франкенштейн (Архитектура)",
+          icon: "fa-cube",
+          items: [
+            "CRM показывает одно, 1С — другое, а склад в реальности — третье. Сводить данные — это отдельный квест на выходных.",
+            "Добавить новый канал продаж (например, начать продавать на маркетплейсе) — это месяцы боли, интеграторов и диких бюджетов.",
+            "У нас полно самописных табличек и скриптов, которые работают на компе у Васи, и если Вася перезагрузит комп — всё встанет.",
+          ],
+        },
+        {
+          title: "Управленческая слепота и безопасность",
+          icon: "fa-eye-slash",
+          items: [
+            "Чтобы понять, сколько мы реально заработали в этом месяце (чистыми, без кассовых разрывов), мне нужно просить буха/финдира собрать выписку, и это занимает дни.",
+            "Я не знаю в реальном времени, какой у нас конверсии из лида в продажу, и узнаю об этом только в конце месяца.",
+            "Мы надеемся на честность и внимательность сотрудников, что они не отправят клиентскую базу конкурентам или не скинут договор не в тот чат (DLP-систем нет).",
+          ],
+        },
+      ];
 
-    <!-- Результат -->
-    <div class="result-box" id="resultBox">
-      <div class="result-counter" id="resultCounter">0 / 10</div>
-      <div class="result-message" id="resultMessage">Отметьте пункты, которые относятся к вашему бизнесу, чтобы получить рекомендацию.</div>
-    </div>
+      // Собираем плоский массив пунктов для удобного доступа, но рендерим поблочно
+      let allItems = [];
+      blocks.forEach((block) => {
+        block.items.forEach((text) => {
+          allItems.push({ text });
+        });
+      });
+      const TOTAL_ITEMS = allItems.length; // 16
 
-    <!-- Кнопки действий -->
-    <div class="button-group" id="actionButtons">
-      <a href="https://t.me/cycleless_channel" target="_blank" class="btn btn-outline"><i class="fab fa-telegram"></i> Больше пользы в Telegram</a>
-    </div>
-    <div class="footer-note">© Cycleless — AI-интегратор. Превращаем хаос в автономный конвейер.</div>
-  </div>
+      // Хранилище отмеченных чекбоксов (по индексу)
+      let checkedIndices = new Set();
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
-  </script>
-  </script>
+      // DOM элементы
+      const checklistRoot = document.getElementById("checklistRoot");
+      const resultCounterSpan = document.getElementById("resultCounter");
+      const resultMessageDiv = document.getElementById("resultMessage");
+      const checkBtn = document.getElementById("checkResultsBtn");
 
-  <script>
-    // Данные чек-листа (10 пунктов)
-    const checklistData = [
-      {
-        id: 1,
-        question: "Уволился ключевой сотрудник — и процесс встал. Новичок вместо 2 недель учится 2 месяца, потому что регламентов нет или они устарели. Сколько часов в неделю ваши люди тратят на вопрос «А кто знает, как это сделать?»",
-        solution: "Автоматизация: ИИ-базы знаний и ассистенты по внутренним регламентам (RAG).",
-      },
-      {
-        id: 2,
-        question: "Вспомните вчерашний день ваших менеджеров. Сколько раз они копировали данные из почты в CRM, из CRM в таблицу, из таблицы в 1С? Если больше 2 раз для одной сущности — это зомби-процесс, который сожрал ваши деньги.",
-        solution: "Автоматизация: RPA-боты и интеграционные шины (iPaaS).",
-      },
-      {
-        id: 3,
-        question: "Заявка падает в CRM. Сколько минут проходит до первого касания клиентом? Если больше 5 минут (ночью, в выходной, в обед) — лид остывает и уходит к конкурентам. Вы уверены, что ваш процесс 24/7?",
-        solution: "Автоматизация: Триггерные цепочки, ИИ-ассистенты первичного квалифицирования.",
-      },
-      {
-        id: 4,
-        question: "Ваша CRM говорит одно, склад в 1С — другое, а кассир в магазине — третье. Как часто вы ловите расхождения, из-за которых компания теряет деньги (пересортица, скидки не тем, упущенные заказы)?",
-        solution: "Автоматизация: Микросервисные шины данных (ESB/API), мастер-системы (MDM).",
-      },
-      {
-        id: 5,
-        question: "Вы точно знаете, что на счетах будет хватать денег на выплаты зарплаты и налогов через 3 недели? Или вы каждый раз собираете баланс ручками в Excel, матерясь и считая дебет с кредитом в ночь перед оплатой?",
-        solution: "Автоматизация: Авто-сверка с банками, платежные календари, интеграция 1С с CRM.",
-      },
-      {
-        id: 6,
-        question: "Менеджер по ошибке слил базу клиентов конкуренту, или отправил договор с печатью не в ту группу в Telegram. Как быстро вы об этом узнаете и сможете это предотвратить до того, как прилетит штраф?",
-        solution: "Автоматизация: DLP-системы, ИИ-модерация документов, автоматическое сокрытие персональных данных.",
-      },
-      {
-        id: 7,
-        question: "Вам нужно добавить новый канал продаж (например, Авито или маркетплейс) или сменить логистическую компанию. Это требует 3 месяца доработок программиста и миллион рублей? Ваша система монолитна, как бетонный блок?",
-        solution: "Автоматизация: Микросервисы, Low-Code платформы, архитектура plug-and-play коннекторов.",
-      },
-      {
-        id: 8,
-        question: "Руководитель спрашивает: «Какая чистая прибыль по проекту X с учетом возвратов на прошлой неделе?». Через сколько минут/часов/дней ему дадут точный ответ? Если ответ: «На следующей неделе соберу данные» — вы управляете бизнесом вслепую.",
-        solution: "Автоматизация: Data Pipelines, дашборды реального времени, ИИ-аналитика.",
-      },
-      {
-        id: 9,
-        question: "Вы купили крутую систему, но 40% сотрудников заводят данные криво, а 20% вообще саботируют и ведут учет в своих блокнотах. Сложность интерфейса убивает смысл автоматизации?",
-        solution: "Автоматизация: Low-Code порталы под роли, ИИ-ассистенты, которые делают работу по голосовой команде или одному клику.",
-      },
-      {
-        id: 10,
-        question: "Есть ли у вас процессы, которые делаются «потому что так исторически сложилось», но никто не знает, кто их потребляет? (Например, ежедневный отчет, который никто не читает, или двойное согласование документа).",
-        solution: "Автоматизация: Process Mining (интеллектуальный анализ логов систем), выявление аномалий и дублирующих шагов.",
-      }
-    ];
+      // Функция отрисовки блоков с чекбоксами
+      function renderChecklist() {
+        checklistRoot.innerHTML = "";
+        let globalIdx = 0;
+        for (let b = 0; b < blocks.length; b++) {
+          const block = blocks[b];
+          const blockDiv = document.createElement("div");
+          blockDiv.className = "block-section";
+          blockDiv.innerHTML = `
+        <div class="block-title">
+          <i class="fas ${block.icon}"></i> 
+          <span>${block.title}</span>
+        </div>
+        <div class="checklist-group" id="block-${b}"></div>
+      `;
+          const groupContainer = blockDiv.querySelector(".checklist-group");
 
-    const checklistContainer = document.getElementById('checklistContainer');
-    const resultCounter = document.getElementById('resultCounter');
-    const resultMessage = document.getElementById('resultMessage');
-
-    // Генерация чек-листа
-    function renderChecklist() {
-      checklistContainer.innerHTML = '';
-      checklistData.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'check-item';
-        div.dataset.id = item.id;
-        div.innerHTML = `
+          for (let i = 0; i < block.items.length; i++) {
+            const itemText = block.items[i];
+            const itemId = globalIdx; // уникальный индекс от 0 до 15
+            const itemDiv = document.createElement("div");
+            itemDiv.className = "check-item";
+            if (checkedIndices.has(itemId)) itemDiv.classList.add("checked");
+            itemDiv.dataset.idx = itemId;
+            itemDiv.innerHTML = `
           <div class="row">
-            <div class="custom-checkbox" onclick="toggleItem(${item.id})">
+            <div class="custom-checkbox">
               <i class="fas fa-check"></i>
             </div>
-            <div class="question-text" onclick="toggleItem(${item.id})">${item.question}</div>
-          </div>
-          <div class="solution-block">
-            <div class="solution-title"><i class="fas fa-lightbulb"></i> Решение Cycleless</div>
-            ${item.solution}
+            <div class="question-text">${escapeHtml(itemText)}</div>
           </div>
         `;
-        checklistContainer.appendChild(div);
-      });
-    }
-
-    // Состояние отметок
-    let checkedSet = new Set();
-
-    function toggleItem(id) {
-      if (checkedSet.has(id)) {
-        checkedSet.delete(id);
-      } else {
-        checkedSet.add(id);
-      }
-      updateUI();
-    }
-
-    function updateUI() {
-      // Обновить классы чек-итемов
-      document.querySelectorAll('.check-item').forEach(item => {
-        const id = parseInt(item.dataset.id);
-        if (checkedSet.has(id)) {
-          item.classList.add('checked');
-        } else {
-          item.classList.remove('checked');
+            // обработчик клика на весь блок
+            itemDiv.addEventListener("click", (e) => {
+              // предотвращаем всплытие, если клик по внутренним ссылкам (но их нет)
+              e.stopPropagation();
+              toggleItemById(itemId);
+            });
+            groupContainer.appendChild(itemDiv);
+            globalIdx++;
+          }
+          checklistRoot.appendChild(blockDiv);
         }
-      });
-      // Обновить результат
-      const count = checkedSet.size;
-      resultCounter.textContent = count + ' / 10';
-      let message = '';
-      if (count === 0) {
-        message = 'Отметьте пункты, которые относятся к вашему бизнесу, чтобы получить рекомендацию.';
-      } else if (count <= 3) {
-        message = 'У вас всё неплохо, нужны точечные RPA-решения.';
-      } else if (count <= 6) {
-        message = 'У вас системный кризис интеграций, пора строить микросервисную архитектуру и внедрять ИИ-ассистентов.';
-      } else {
-        message = 'Ваш бизнес в шаге от коллапса при росте. Нужна полная ре-архитектура и гиперавтоматизация с Low-Code.';
       }
-      resultMessage.textContent = message;
-    }
 
-    // Инициализация
-    renderChecklist();
-    updateUI();
-  </script>
-</body>
+      // вспомогательная функция для экранирования HTML (чтобы не было проблем с кавычками)
+      function escapeHtml(str) {
+        return str
+          .replace(/[&<>]/g, function (m) {
+            if (m === "&") return "&amp;";
+            if (m === "<") return "&lt;";
+            if (m === ">") return "&gt;";
+            return m;
+          })
+          .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function (c) {
+            return c;
+          });
+      }
+
+      // Переключение состояния по индексу
+      function toggleItemById(idx) {
+        if (checkedIndices.has(idx)) {
+          checkedIndices.delete(idx);
+        } else {
+          checkedIndices.add(idx);
+        }
+        updateVisualsAndCounter();
+      }
+
+      // обновляем визуал (классы checked) и отображаем кол-во
+      function updateVisualsAndCounter() {
+        // обновить классы у всех check-item
+        const items = document.querySelectorAll(".check-item");
+        items.forEach((item, idx) => {
+          const itemIdx = parseInt(item.dataset.idx);
+          if (checkedIndices.has(itemIdx)) {
+            item.classList.add("checked");
+          } else {
+            item.classList.remove("checked");
+          }
+        });
+        // обновить счетчик
+        const count = checkedIndices.size;
+        resultCounterSpan.textContent = `${count} / ${TOTAL_ITEMS}`;
+        // НЕ обновляем сообщение диагноза автоматически — только по кнопке, но счетчик живёт
+      }
+
+      // ГЛАВНАЯ ФУНКЦИЯ — выдать диагноз по жесткой шкале пользователя (0–2, 3–5, 6–8, 9+)
+      function computeDiagnosis() {
+        const count = checkedIndices.size;
+        let diagnosis = "";
+        if (count <= 2) {
+          diagnosis =
+            "🔹 0–2 галочки: Ты цифровой ниндзя. Либо у тебя микро-бизнес, где всё в одних руках, либо ты уже всё автоматизировал. (Но признайся, ты ведь соврал на паре пунктов?)";
+        } else if (count >= 3 && count <= 5) {
+          diagnosis =
+            "🔸 3–5 галочек: Ты в зоне комфорта, которая медленно гниет. Бизнес работает, но на 60% мощности. Сотрудники ворчат, процессы подтекают. Что делать: выбери самую дорогую рутину (там, где больше всего человеко-часов уходит в трубу) и внедри одну простую RPA-автоматизацию или интеграцию через API.";
+        } else if (count >= 6 && count <= 8) {
+          diagnosis =
+            "⚠️ 6–8 галочек: Твой бизнес — это черная дыра для эффективности. Ты сжигаешь кучу денег на ФОТ людей, которые делают работу алгоритмов. Каждое масштабирование = дикие костыли и найм новых «копипастеров». Срочно нужна Low-code платформа, связка CRM-1С через интеграционную шину и ИИ-ассистент для разгрузки первой линии.";
+        } else {
+          // 9 и больше
+          diagnosis =
+            "💀 9+ галочек: Критическая терминальная стадия. Ты управляешь хаосом. Любой внешний удар (конкурент снизил цены, курьер поднял тарифы) может убить компанию, потому что у тебя нет скорости реакции, данные разрознены, а люди заняты обслуживанием процессов, а не бизнесом. Нужна полная ре-архитектура. Остановить дыры: внедрить мастер-данные (MDM), оцифровать ядро процессов, закрыть базовый комплаенс.";
+        }
+        return `📊 Диагноз: ${diagnosis}`;
+      }
+
+      // обработчик по кнопке "Проверить результаты"
+      function showResult() {
+        const count = checkedIndices.size;
+        const diagnosisText = computeDiagnosis();
+        resultMessageDiv.innerHTML = `<i class="fas fa-skull-crosswalk"></i> ${diagnosisText}<br><span style="font-size:13px; display:inline-block; margin-top:8px;">✅ Отмечено ${count} из ${TOTAL_ITEMS} проблемных зон.</span>`;
+        // небольшой скролл к результату для удобства
+        document
+          .getElementById("resultBox")
+          .scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      // Инициализация
+      renderChecklist();
+      updateVisualsAndCounter(); // начальный счетчик 0/16, без диагноза
+
+      // Навешиваем событие на кнопку
+      checkBtn.addEventListener("click", showResult);
+
+      // Доп. фича: если пользователь нажимает на результат, можно показать диагноз повторно? нет, кнопка делает это.
+      // Но если сильно хочется — можно добавить даблклик на счетчик, но не нужно.
+
+      // Небольшой фикс для мобильных: чтобы чекбокс красиво реагировал
+      // уже есть обработчик на весь .check-item, так что всё ок.
+    </script>
+  </body>
 </html>
-
