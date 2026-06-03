@@ -260,6 +260,15 @@
         border-radius: 60px;
       }
 
+      .result-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 8px;
+        width: 100%;
+      }
+
       .btn-group {
         display: flex;
         gap: 18px;
@@ -312,6 +321,10 @@
         font-family: var(--font-m);
       }
 
+      .hidden {
+        display: none !important;
+      }
+
       @media (max-width: 600px) {
         .landing {
           padding: 24px 16px 40px;
@@ -327,6 +340,9 @@
         }
         .btn {
           padding: 12px 22px;
+        }
+        .result-actions {
+          gap: 12px;
         }
       }
     </style>
@@ -390,19 +406,31 @@
           ⚡ Нажми кнопку «Проверить диагноз» — узнаешь, насколько жестко тебя
           жрут процессы.
         </div>
+
+        <div class="result-actions hidden" id="resultActions">
+          <a
+            href="https://t.me/cycleless"
+            target="_blank"
+            class="btn btn-accent"
+            id="managerBtn"
+          >
+            <i class="fab fa-telegram"></i> Менеджер 24/7 (@cycleless)
+          </a>
+          <a
+            href="https://t.me/+ZJgdCCda1NVhYzhi"
+            target="_blank"
+            class="btn btn-outline"
+            id="channelBtn"
+          >
+            <i class="fas fa-lock"></i> Приватный ТГ канал
+          </a>
+        </div>
       </div>
 
       <div class="btn-group">
         <button class="btn btn-accent" id="checkResultsBtn">
           <i class="fas fa-stethoscope"></i> Проверить результаты
         </button>
-        <a
-          href="https://t.me/+ZJgdCCda1NVhYzhi"
-          target="_blank"
-          class="btn btn-outline"
-          ><i class="fab fa-telegram"></i> Больше пользы в закрытом Telegram
-          канале</a
-        >
       </div>
       <div class="footer-note">
         2026 Cycleless — AI-интегратор. Превращаем хаос в автономный конвейер.
@@ -410,7 +438,7 @@
     </div>
 
     <script>
-      // ---------- НОВЫЙ ЖЁСТКИЙ ЧЕКЛИСТ (16 пунктов, без решений, только правда) ----------
+      // ---------- ЖЁСТКИЙ ЧЕКЛИСТ (16 пунктов) ----------
       const blocks = [
         {
           title: "Рутина и цифровое рабство",
@@ -460,7 +488,7 @@
         },
       ];
 
-      // Собираем плоский массив пунктов для удобного доступа, но рендерим поблочно
+      // Собираем плоский массив пунктов (всего 16)
       let allItems = [];
       blocks.forEach((block) => {
         block.items.forEach((text) => {
@@ -469,7 +497,7 @@
       });
       const TOTAL_ITEMS = allItems.length; // 16
 
-      // Хранилище отмеченных чекбоксов (по индексу)
+      // Хранилище отмеченных чекбоксов (по индексу от 0 до 15)
       let checkedIndices = new Set();
 
       // DOM элементы
@@ -477,6 +505,7 @@
       const resultCounterSpan = document.getElementById("resultCounter");
       const resultMessageDiv = document.getElementById("resultMessage");
       const checkBtn = document.getElementById("checkResultsBtn");
+      const resultActionsDiv = document.getElementById("resultActions");
 
       // Функция отрисовки блоков с чекбоксами
       function renderChecklist() {
@@ -497,7 +526,7 @@
 
           for (let i = 0; i < block.items.length; i++) {
             const itemText = block.items[i];
-            const itemId = globalIdx; // уникальный индекс от 0 до 15
+            const itemId = globalIdx;
             const itemDiv = document.createElement("div");
             itemDiv.className = "check-item";
             if (checkedIndices.has(itemId)) itemDiv.classList.add("checked");
@@ -512,7 +541,6 @@
         `;
             // обработчик клика на весь блок
             itemDiv.addEventListener("click", (e) => {
-              // предотвращаем всплытие, если клик по внутренним ссылкам (но их нет)
               e.stopPropagation();
               toggleItemById(itemId);
             });
@@ -523,7 +551,6 @@
         }
       }
 
-      // вспомогательная функция для экранирования HTML (чтобы не было проблем с кавычками)
       function escapeHtml(str) {
         return str
           .replace(/[&<>]/g, function (m) {
@@ -537,7 +564,6 @@
           });
       }
 
-      // Переключение состояния по индексу
       function toggleItemById(idx) {
         if (checkedIndices.has(idx)) {
           checkedIndices.delete(idx);
@@ -547,11 +573,9 @@
         updateVisualsAndCounter();
       }
 
-      // обновляем визуал (классы checked) и отображаем кол-во
       function updateVisualsAndCounter() {
-        // обновить классы у всех check-item
         const items = document.querySelectorAll(".check-item");
-        items.forEach((item, idx) => {
+        items.forEach((item) => {
           const itemIdx = parseInt(item.dataset.idx);
           if (checkedIndices.has(itemIdx)) {
             item.classList.add("checked");
@@ -559,13 +583,11 @@
             item.classList.remove("checked");
           }
         });
-        // обновить счетчик
         const count = checkedIndices.size;
         resultCounterSpan.textContent = `${count} / ${TOTAL_ITEMS}`;
-        // НЕ обновляем сообщение диагноза автоматически — только по кнопке, но счетчик живёт
       }
 
-      // ГЛАВНАЯ ФУНКЦИЯ — выдать диагноз по жесткой шкале пользователя (0–2, 3–5, 6–8, 9+)
+      // Жёсткий диагноз на основе количества галочек
       function computeDiagnosis() {
         const count = checkedIndices.size;
         let diagnosis = "";
@@ -586,29 +608,65 @@
         return `📊 Диагноз: ${diagnosis}`;
       }
 
-      // обработчик по кнопке "Проверить результаты"
+      // Функция, которая обновляет диагноз и ПОКАЗЫВАЕТ кнопки (если ещё не показаны)
       function showResult() {
         const count = checkedIndices.size;
         const diagnosisText = computeDiagnosis();
         resultMessageDiv.innerHTML = `<i class="fas fa-skull-crosswalk"></i> ${diagnosisText}<br><span style="font-size:13px; display:inline-block; margin-top:8px;">✅ Отмечено ${count} из ${TOTAL_ITEMS} проблемных зон.</span>`;
-        // небольшой скролл к результату для удобства
+
+        resultActionsDiv.classList.remove("hidden");
+
+        const managerBtn = document.getElementById("managerBtn");
+        const channelBtn = document.getElementById("channelBtn");
+
+        // Скрыть обе кнопки по умолчанию перед логикой
+        managerBtn.style.display = "none";
+        channelBtn.style.display = "none";
+
+        if (count <= 2) {
+          // Только канал
+          channelBtn.style.display = "inline-flex";
+        } else if (count >= 3 && count <= 5) {
+          // Обе кнопки, но канал первый
+          channelBtn.style.display = "inline-flex";
+          managerBtn.style.display = "inline-flex";
+        } else if (count >= 6 && count <= 8) {
+          // Обе кнопки, менеджер главный
+          managerBtn.style.display = "inline-flex";
+          channelBtn.style.display = "inline-flex";
+          // Меняем текст кнопки менеджера для срочности
+          managerBtn.innerHTML =
+            '<i class="fab fa-telegram"></i> Срочно нужен архитектор (@cycleless)';
+        } else {
+          // 9+ Только менеджер! Горит!
+          managerBtn.style.display = "inline-flex";
+          managerBtn.innerHTML =
+            '<i class="fas fa-fire-extinguisher"></i> ПОЖАР! Срочно спасать бизнес (@cycleless)';
+          // Делаем кнопку больше и красочнее
+          managerBtn.style.background = "#ff4d4d";
+          managerBtn.style.borderColor = "#ff4d4d";
+          managerBtn.style.color = "#fff";
+          managerBtn.style.fontSize = "16px";
+          managerBtn.style.padding = "18px 36px";
+        }
+
         document
           .getElementById("resultBox")
           .scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
-      // Инициализация
+      // Инициализация: рендер чеклиста, сброс видимости кнопок (скрыты изначально)
       renderChecklist();
-      updateVisualsAndCounter(); // начальный счетчик 0/16, без диагноза
+      updateVisualsAndCounter(); // начальный счетчик 0/16
 
-      // Навешиваем событие на кнопку
+      // Убедимся, что кнопки действий скрыты при загрузке (на всякий случай)
+      resultActionsDiv.classList.add("hidden");
+
+      // Навешиваем событие на кнопку проверки
       checkBtn.addEventListener("click", showResult);
 
-      // Доп. фича: если пользователь нажимает на результат, можно показать диагноз повторно? нет, кнопка делает это.
-      // Но если сильно хочется — можно добавить даблклик на счетчик, но не нужно.
-
-      // Небольшой фикс для мобильных: чтобы чекбокс красиво реагировал
-      // уже есть обработчик на весь .check-item, так что всё ок.
+      // Дополнительно: если пользователь захочет повторно нажать "Проверить" — кнопки уже будут видны, ничего страшного.
+      // Сохраняем функционал: после клика — диагноз и показ двух кнопок.
     </script>
   </body>
 </html>
