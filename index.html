@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=yes"
     />
-    <title>Cycleless — Экспресс-аудит бизнес-процессов</title>
+    <title>Cycleless — ИИ-диагностика: нужен ли ИИ вашему бизнесу?</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -36,7 +36,6 @@
         position: relative;
       }
 
-      /* Сетка */
       body::before {
         content: "";
         position: fixed;
@@ -57,6 +56,7 @@
         --border: rgba(255, 255, 255, 0.06);
         --muted: #5a6a7a;
         --font-m: "JetBrains Mono", monospace;
+        --warn-red: #ff4d4d;
       }
 
       .landing {
@@ -165,7 +165,6 @@
         font-size: 22px;
       }
 
-      /* Блоки чеклиста */
       .block-section {
         margin-bottom: 28px;
       }
@@ -250,7 +249,6 @@
         color: #eef3fc;
       }
 
-      /* Результаты */
       .result-box {
         background: var(--bg-2);
         border: 1px solid var(--border);
@@ -405,19 +403,19 @@
       </div>
 
       <div>
-        <div class="title">АУДИТ ЭФФЕКТИВНОСТИ<br />БИЗНЕС-ПРОЦЕССОВ</div>
+        <div class="title">НУЖЕН ЛИ ВАМ ИИ<br />НА САМОМ ДЕЛЕ?</div>
         <div class="subhead">
-          Оцените потенциал снижения издержек и точки роста для внедрения AI с
-          гарантией SLA
+          Не хайп, а прагматика: 16 индикаторов, которые покажут, принесет ли ИИ
+          реальную прибыль или станет дорогой игрушкой.
         </div>
       </div>
 
       <div class="instruction">
-        <i class="fas fa-clipboard-check"></i>
+        <i class="fas fa-brain"></i>
         <span
-          >Отметьте утверждения, актуальные для вашей компании. Это займет 2
-          минуты и покажет, насколько ваша операционная модель готова к
-          масштабированию.</span
+          >Отметьте ситуации, которые знакомы вашему бизнесу. Анализ займёт 2
+          минуты — вы получите честный вердикт: нужен ли ИИ именно вам, или
+          стоит сначала укрепить базу.</span
         >
       </div>
 
@@ -426,10 +424,9 @@
       <div class="result-box" id="resultBox">
         <div class="result-counter" id="resultCounter">0 / 16</div>
         <div class="result-message" id="resultMessage">
-          Нажмите «Получить диагностику», чтобы увидеть разбор вашей ситуации и
-          конкретные рекомендации.
+          ✅ Пройдите диагностику — отметьте проблемные зоны, и система скажет,
+          где ИИ решит задачи, а где пока рано.
         </div>
-
         <div class="result-actions hidden" id="resultActions">
           <a
             href="https://t.me/cycleless"
@@ -445,14 +442,15 @@
             class="btn btn-outline"
             id="channelBtn"
           >
-            <i class="fas fa-lock"></i> Приватный ТГ-канал (инструменты)
+            <i class="fas fa-lock"></i> Приватный ТГ-канал (кейсы +
+            AI-инструменты)
           </a>
         </div>
       </div>
 
       <div class="btn-group">
         <button class="btn btn-accent" id="checkResultsBtn">
-          <i class="fas fa-stethoscope"></i> Получить диагностику
+          <i class="fas fa-stethoscope"></i> Получить вердикт по ИИ
         </button>
       </div>
       <div class="footer-note">
@@ -462,76 +460,81 @@
     </div>
 
     <script>
-      // ---------- ДЕЛОВОЙ ЧЕКЛИСТ (16 пунктов) ----------
+      // ============================================================
+      // КЛЮЧЕВЫЕ ВОПРОСЫ: НУЖЕН ЛИ ИИ ВАШЕМУ БИЗНЕСУ (16 шт.)
+      // Блоки: операционная нагрузка, данные и аналитика, клиенты, автоматизация, инновации
+      // ============================================================
       const blocks = [
         {
-          title: "Операционные издержки и рутина",
+          title: "Операционная рутина и нагрузка",
           icon: "fa-robot",
           items: [
-            "Сотрудники регулярно выполняют ручной перенос данных между email, мессенджерами, CRM и Excel.",
-            "Значительная часть рабочего времени уходит на шаблонные операции, которые можно алгоритмизировать.",
-            "Формирование и разноска первичной документации (счета, акты) происходит вручную, создавая задержки и ошибки.",
-            "Ключевые бизнес-процессы зависят от конкретных исполнителей и останавливаются в их отсутствие.",
+            "Сотрудники ежедневно вручную переносят данные между CRM, таблицами, email и чатами (потеря времени >20 ч/нед).",
+            "Более 40% рабочего времени команды уходит на шаблонные задачи (сверки, отчёты, копирование данных).",
+            "Бизнес-процессы зависят от одного-двух ключевых сотрудников, при их отсутствии всё останавливается.",
+            "Документооборот (счета, акты, договоры) создаётся и обрабатывается вручную с высокой вероятностью ошибок.",
           ],
         },
         {
-          title: "Управление знаниями и регламентация",
-          icon: "fa-brain",
+          title: "Данные и аналитика: хаос vs инсайты",
+          icon: "fa-chart-line",
           items: [
-            "Адаптация новых сотрудников затягивается из-за отсутствия единой и актуальной базы знаний.",
-            "Рабочие инструкции существуют в разрозненных версиях на разных носителях без единого стандарта.",
-            "При уходе опытного специалиста компания критически теряет накопленный контекст и экспертизу.",
+            "Вы собираете много клиентских данных, но не можете быстро извлечь тренды или прогнозировать спрос.",
+            "Аналитика строится на отчётах в Excel, которые обновляются несколько дней — решения принимаются вслепую.",
+            "Отсутствует единая база знаний: адаптация новичков занимает месяцы, экспертиза теряется при уходе сотрудников.",
+            "Вы тратите часы на ручную сверку остатков, закупок или финансов (кассовые разрывы предсказать невозможно).",
           ],
         },
         {
-          title: "Клиентский сервис и продажи",
-          icon: "fa-users-slash",
+          title: "Клиентский опыт и продажи",
+          icon: "fa-users",
           items: [
-            "Обработка лидов и заявок не автоматизирована, скорость реакции зависит от загрузки конкретного менеджера.",
-            "Отсутствует единая карточка клиента с полной историей коммуникаций, что приводит к несогласованности в работе.",
-            "Процесс передачи заказа в работу после оплаты содержит разрывы, требующие постоянного ручного контроля.",
+            "Скорость реакции на лиды и заявки низкая (более 30 минут), конкуренты отвечают быстрее за счёт AI-чатов.",
+            "Нет персонализации: клиенты получают массовые рассылки без учёта их поведения и истории.",
+            "После оплаты заказ часто «теряется» между отделами, требуя ручного контроля на каждом этапе.",
+            "Клиентская поддержка перегружена однотипными вопросами, время ответа растёт, а качество страдает.",
           ],
         },
         {
-          title: "ИТ-архитектура и интеграция данных",
-          icon: "fa-cube",
+          title: "Автоматизация и интеграция",
+          icon: "fa-cubes",
           items: [
-            "Учетные системы (CRM, ERP, складской учёт) не синхронизированы, требуется регулярная ручная сверка данных.",
-            "Подключение нового канала продаж или продукта требует длительных и дорогостоящих ИТ-доработок.",
-            "Критически важные для бизнеса скрипты или данные хранятся локально на компьютерах сотрудников без резервирования.",
+            "CRM, ERP, склад и сайт не синхронизированы — данные дублируются вручную, ошибки неизбежны.",
+            "Запуск нового канала продаж или услуги требует недель разработки из-за монолитной архитектуры.",
+            "Сотрудники используют десяток отдельных сервисов, нет единого окна управления задачами и коммуникацией.",
+            "Ключевые бизнес-логики зашиты в локальные скрипты на ПК — риск потери данных и остановки процессов.",
           ],
         },
         {
-          title: "Управленческая прозрачность и контроль",
-          icon: "fa-eye-slash",
+          title: "Инновации и конкурентное давление",
+          icon: "fa-microchip",
           items: [
-            "Формирование управленческой отчетности (чистая прибыль, кассовые разрывы) занимает дни из-за ручной консолидации данных.",
-            "Отсутствует дашборд для мониторинга ключевых метрик (воронка продаж, конверсия) в режиме реального времени.",
-            "В компании нет технических средств предотвращения утечек информации (DLP), защита строится исключительно на лояльности персонала.",
+            "Конкуренты уже внедряют AI-ассистентов, а вы только изучаете теорию без пилотных проектов.",
+            "Ручная обработка заявок/документов ограничивает масштабирование: рост выручки требует непропорционального роста ФОТ.",
+            "Вы не используете прогнозную аналитику для управления запасами, финансовыми потоками и рисками.",
+            "В компании нет стратегии внедрения AI, все инициативы разовые и не дают измеримого ROI.",
           ],
         },
       ];
 
-      // Собираем плоский массив пунктов (всего 16)
+      // Собираем плоский массив пунктов
       let allItems = [];
       blocks.forEach((block) => {
         block.items.forEach((text) => {
           allItems.push({ text });
         });
       });
-      const TOTAL_ITEMS = allItems.length; // 16
+      const TOTAL_ITEMS = allItems.length; // должно быть 16
 
-      // Хранилище отмеченных чекбоксов (по индексу от 0 до 15)
       let checkedIndices = new Set();
 
-      // DOM элементы
       const checklistRoot = document.getElementById("checklistRoot");
       const resultCounterSpan = document.getElementById("resultCounter");
       const resultMessageDiv = document.getElementById("resultMessage");
       const checkBtn = document.getElementById("checkResultsBtn");
       const resultActionsDiv = document.getElementById("resultActions");
 
-      // Функция отрисовки блоков с чекбоксами
+      // отрисовка
       function renderChecklist() {
         checklistRoot.innerHTML = "";
         let globalIdx = 0;
@@ -547,7 +550,6 @@
         <div class="checklist-group" id="block-${b}"></div>
       `;
           const groupContainer = blockDiv.querySelector(".checklist-group");
-
           for (let i = 0; i < block.items.length; i++) {
             const itemText = block.items[i];
             const itemId = globalIdx;
@@ -563,7 +565,6 @@
             <div class="question-text">${escapeHtml(itemText)}</div>
           </div>
         `;
-            // обработчик клика на весь блок
             itemDiv.addEventListener("click", (e) => {
               e.stopPropagation();
               toggleItemById(itemId);
@@ -576,16 +577,12 @@
       }
 
       function escapeHtml(str) {
-        return str
-          .replace(/[&<>]/g, function (m) {
-            if (m === "&") return "&amp;";
-            if (m === "<") return "&lt;";
-            if (m === ">") return "&gt;";
-            return m;
-          })
-          .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function (c) {
-            return c;
-          });
+        return str.replace(/[&<>]/g, function (m) {
+          if (m === "&") return "&amp;";
+          if (m === "<") return "&lt;";
+          if (m === ">") return "&gt;";
+          return m;
+        });
       }
 
       function toggleItemById(idx) {
@@ -611,73 +608,104 @@
         resultCounterSpan.textContent = `${count} / ${TOTAL_ITEMS}`;
       }
 
-      // Деловая диагностика на основе количества пунктов
-      function computeDiagnosis() {
-        const count = checkedIndices.size;
-        let diagnosis = "";
-        if (count <= 2) {
-          diagnosis =
-            "Стадия «Стартап/Начало цифровизации». Процессы гибкие, но зависят от ручного управления. Рекомендуем внедрить CRM-систему и начать регламентацию ключевых операций для прозрачности.";
-        } else if (count >= 3 && count <= 5) {
-          diagnosis =
-            "Стадия «Фрагментированная автоматизация». Инструменты есть, но работают разрозненно. Основные потери возникают на стыках между отделами. Рекомендуем аудит и настройку бесшовных интеграций.";
-        } else if (count >= 6 && count <= 8) {
-          diagnosis =
-            "Стадия «Ручное управление в масштабе». Компания активно теряет деньги на рутине. Масштабирование затруднено из-за роста ФОТ и хаоса в данных. Необходима централизация данных и внедрение AI-ассистентов для разгрузки персонала.";
+      // Главная логика: вердикт о нужности ИИ на основе количества "симптомов"
+      function getVerdictAndRecommendation(score) {
+        if (score <= 3) {
+          return {
+            level: "low",
+            title: "🔍 ИИ – преждевременная роскошь",
+            message:
+              "Ваши процессы ещё не достигли «болевой точки», где AI окупается быстрее месяца. Сейчас важнее: чёткие регламенты, базовая CRM и цифровизация учёта. ИИ пока не даст взрывного эффекта — укрепите операционный фундамент.",
+            recommendation:
+              "Рекомендуем начать с аудита процессов и бесплатного чек-апа от Cycleless, чтобы подготовить почву для будущих технологий.",
+          };
+        } else if (score >= 4 && score <= 7) {
+          return {
+            level: "medium",
+            title: "⚙️ ИИ усилит отдельные зоны",
+            message:
+              "В компании есть точки роста, где AI-ассистенты и RPA снизят рутину на 20–30%. Особый потенциал: обработка заявок, генерация документов, базовая аналитика. Но комплексное внедрение пока избыточно.",
+            recommendation:
+              "Стартуйте с малого: чат-бот для лидов, автоматическая выгрузка данных или умный справочник. Cycleless подберёт пилотный проект с гарантией ROI.",
+          };
+        } else if (score >= 8 && score <= 11) {
+          return {
+            level: "high",
+            title: "🚀 ИИ даст значительное преимущество",
+            message:
+              "Множество ручных операций и разрывов в данных тормозят рост. Грамотное внедрение AI-агентов (прогнозирование, персонализация, автоматизация сверок) способно сократить издержки на 30–45% и ускорить принятие решений.",
+            recommendation:
+              "Мы рекомендуем комплексный аудит процессов с целью построения «дорожной карты» AI-интеграции с приоритетом быстрых побед.",
+          };
         } else {
-          // 9 и больше
-          diagnosis =
-            "Стадия «Высокий операционный риск». Бизнес-процессы нестабильны, высоки риски кассовых разрывов и потери клиентов. Требуется срочная ре-архитектура и внедрение комплексной системы управления с гарантией SLA.";
+          // 12-16
+          return {
+            level: "critical",
+            title: "🔥 ИИ критически необходим — бизнес под угрозой",
+            message:
+              "Ваша операционная модель перегружена хаосом, потерями данных и ручным трудом. Конкуренты уже используют AI для ценообразования, клиентского сервиса и аналитики. Без внедрения вы рискуете потерять долю рынка и столкнуться с кризисом масштабирования.",
+            recommendation:
+              "Требуется экстренная ре-архитектура процессов и внедрение комплексного AI-оркестратора с SLA-гарантиями. Cycleless предлагает срочный аудит и дорожную карту с финансовой гарантией.",
+          };
         }
-        return `${diagnosis}`;
       }
 
-      // Функция, которая обновляет диагноз и показывает кнопки
       function showResult() {
-        const count = checkedIndices.size;
-        const diagnosisText = computeDiagnosis();
-        resultMessageDiv.innerHTML = `<i class="fas fa-chart-line"></i> ${diagnosisText}<br><span style="font-size:13px; display:inline-block; margin-top:8px;">📌 Отмечено ${count} из ${TOTAL_ITEMS} зон для улучшения.</span>`;
+        const score = checkedIndices.size;
+        const verdict = getVerdictAndRecommendation(score);
+
+        // Формируем расширенное сообщение
+        resultMessageDiv.innerHTML = `
+      <i class="fas fa-chart-simple"></i> ${verdict.title}<br>
+      <span style="font-size:15px; display:inline-block; margin-top:10px;">${verdict.message}</span><br>
+      <span style="font-size:13px; margin-top:10px; opacity:0.7;">📊 Симптомов: ${score} из ${TOTAL_ITEMS}</span>
+      <span style="font-size:13px; display:block; margin-top:6px;">${verdict.recommendation}</span>
+    `;
 
         resultActionsDiv.classList.remove("hidden");
 
         const managerBtn = document.getElementById("managerBtn");
         const channelBtn = document.getElementById("channelBtn");
 
-        // Сброс стилей и видимости
-        managerBtn.style.display = "none";
-        channelBtn.style.display = "none";
-        managerBtn.style.background = "var(--accent)";
-        managerBtn.style.borderColor = "var(--accent)";
-        managerBtn.style.color = "#07080a";
+        // сброс стилей и переопределение
+        managerBtn.style.display = "inline-flex";
+        channelBtn.style.display = "inline-flex";
+        managerBtn.style.background = "";
+        managerBtn.style.borderColor = "";
+        managerBtn.style.color = "";
         managerBtn.style.fontSize = "";
         managerBtn.style.padding = "";
+        managerBtn.innerHTML =
+          '<i class="fab fa-telegram"></i> Связаться с экспертом (@cycleless)';
+        channelBtn.innerHTML =
+          '<i class="fas fa-lock"></i> Приватный ТГ-канал (кейсы + AI-инструменты)';
 
-        if (count <= 2) {
-          // Только канал
+        if (verdict.level === "low") {
+          // Не критично, но можно дать канал и лёгкую консультацию
+          managerBtn.style.display = "none";
           channelBtn.style.display = "inline-flex";
-        } else if (count >= 3 && count <= 5) {
-          // Канал и эксперт
-          channelBtn.style.display = "inline-flex";
+        } else if (verdict.level === "medium") {
+          // И канал, и эксперт
           managerBtn.style.display = "inline-flex";
-          managerBtn.innerHTML =
-            '<i class="fab fa-telegram"></i> Связаться с экспертом (@cycleless)';
-        } else if (count >= 6 && count <= 8) {
-          // Акцент на эксперте
+          channelBtn.style.display = "inline-flex";
+        } else if (verdict.level === "high") {
           managerBtn.style.display = "inline-flex";
           channelBtn.style.display = "inline-flex";
           managerBtn.innerHTML =
-            '<i class="fab fa-telegram"></i> Нужна консультация архитектора';
-        } else {
-          // 9+ Только срочная связь с экспертом
+            '<i class="fab fa-telegram"></i> Записаться на стратегическую сессию (AI-архитектор)';
+          managerBtn.style.background = "var(--accent)";
+          managerBtn.style.borderColor = "var(--accent)";
+        } else if (verdict.level === "critical") {
           managerBtn.style.display = "inline-flex";
+          channelBtn.style.display = "inline-flex";
           managerBtn.innerHTML =
-            '<i class="fas fa-fire"></i> Срочный аудит и дорожная карта внедрения';
-          // Выделяем кнопку
+            '<i class="fas fa-fire"></i> Срочный AI-аудит + дорожная карта внедрения';
           managerBtn.style.background = "#ff4d4d";
           managerBtn.style.borderColor = "#ff4d4d";
           managerBtn.style.color = "#fff";
           managerBtn.style.fontSize = "16px";
-          managerBtn.style.padding = "18px 36px";
+          managerBtn.style.padding = "16px 32px";
+          // канал тоже оставляем
         }
 
         document
@@ -685,12 +713,11 @@
           .scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
-      // Инициализация
+      // инициализация
       renderChecklist();
       updateVisualsAndCounter();
       resultActionsDiv.classList.add("hidden");
 
-      // Навешиваем событие на кнопку проверки
       checkBtn.addEventListener("click", showResult);
     </script>
   </body>
